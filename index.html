@@ -56,8 +56,16 @@
     Ex.: https://script.google.com/macros/s/AKfycb..../exec
     Pode acrescentar ?page=produtos (vitrine), ?page=cadastro ou ?page=admin.
   -->
+  <!--
+    credentialless: carrega o iframe num contexto efêmero, SEM enviar os cookies
+    de sessão do Google (igual a uma aba anônima). É isso que contorna o roteador
+    de conta /u/N/ — com cookies, o Google tenta "adivinhar" a conta dentro do
+    frame e quebra; sem cookies, serve anônimo e abre. Suportado em Chromium
+    (Chrome/Edge 110+). Firefox/Safari ignoram o atributo (fallback: link direto).
+  -->
   <iframe
     id="app"
+    credentialless
     src="https://script.google.com/macros/s/AKfycbwQvFY39YnQ3Z9f3TfZYH55C90q9XhBNvIr0-_J4mlYZVPGx_oE0PQdCpBa7Ew1r-I5/exec"
     title="Alicerce Consultoria — Imóveis"
     allow="clipboard-write; clipboard-read; fullscreen"
