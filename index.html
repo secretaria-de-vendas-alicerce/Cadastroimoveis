@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Alicerce Consultoria — Imóveis</title>
+  <meta name="description" content="Imóveis disponíveis — Alicerce Consultoria.">
+  <!--
+    WRAPPER ANTI /u/N/ — por que este arquivo existe
+    -------------------------------------------------
+    O web app do Apps Script é servido em script.google.com/macros/s/.../exec.
+    Quando o visitante tem 2+ contas Google logadas, o Google redireciona a /exec
+    para /u/1/, /u/2/... chuta o índice errado e mostra "Não foi possível abrir o
+    arquivo". Carregando a MESMA /exec dentro de um <iframe> a partir de um domínio
+    que NÃO é google.com, o Google entrega o app como sub-recurso e não roda esse
+    roteador de conta — abre igual em qualquer navegador, com qualquer conta.
+
+    Pré-requisitos (já feitos no app):
+      - Implantação: "Executar como: Eu" + "Quem pode acessar: Qualquer pessoa".
+      - doGet(): setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL).
+
+    COMO USAR:
+      1. Cole a URL /exec completa em EXEC_URL abaixo.
+      2. Hospede este arquivo em qualquer domínio fora do google.com
+         (GitHub Pages, Netlify, ou o site da Alicerce).
+      3. Compartilhe o link DESTA página — nunca mais a /exec direta.
+  -->
+  <style>
+    :root { color-scheme: light dark; }
+    html, body { margin: 0; height: 100%; background: #0f1115; }
+    /* iframe ocupa o viewport inteiro, respeitando notch no mobile */
+    #app {
+      position: fixed; inset: 0; width: 100%; height: 100%;
+      border: 0; display: block;
+    }
+    #fallback {
+      position: fixed; inset: 0; display: none;
+      align-items: center; justify-content: center; padding: 24px;
+      font: 15px/1.5 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color: #e6e8eb; text-align: center;
+    }
+    #fallback a { color: #7aa2ff; }
+    .loading {
+      position: fixed; inset: 0; display: flex;
+      align-items: center; justify-content: center;
+      font: 14px system-ui, sans-serif; color: #8b94a3;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="loading" id="loading">Carregando imóveis…</div>
+
+  <!--
+    COLE A URL /exec COMPLETA NO src ABAIXO.
+    Ex.: https://script.google.com/macros/s/AKfycb..../exec
+    Pode acrescentar ?page=produtos (vitrine), ?page=cadastro ou ?page=admin.
+  -->
+  <iframe
+    id="app"
+    src="__COLE_A_URL_EXEC_AQUI__"
+    title="Alicerce Consultoria — Imóveis"
+    allow="clipboard-write; clipboard-read; fullscreen"
+    referrerpolicy="no-referrer"
+    onload="document.getElementById('loading').style.display='none'"></iframe>
+
+  <div id="fallback">
+    <div>
+      <p><strong>Não foi possível carregar.</strong></p>
+      <p>Abra o link diretamente:
+        <a id="directLink" href="__COLE_A_URL_EXEC_AQUI__" target="_blank" rel="noopener">abrir o sistema</a>.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    // Se o iframe não sinalizar load em ~12s, oferece o link direto como rede de segurança.
+    setTimeout(function () {
+      var ld = document.getElementById('loading');
+      if (ld && ld.style.display !== 'none') {
+        ld.style.display = 'none';
+        document.getElementById('fallback').style.display = 'flex';
+      }
+    }, 12000);
+  </script>
+</body>
+</html>
