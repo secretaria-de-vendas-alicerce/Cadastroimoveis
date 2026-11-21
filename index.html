@@ -96,5 +96,47 @@
       }
     }, 12000);
   </script>
+  <script>
+    /*
+     * L-1 (O3, CONSELHO-015): a sessão do app mora AQUI, porque o iframe credentialless perde o
+     * storage a cada recarga. Molde: gerenciador-analises/wrapper/analises-v3/index.html. Sem esta
+     * página, ou com outro host, o app pede a senha (falha segura).
+     */
+    (function () {
+      var CHAVE = 'imv-sessao';
+      var app = document.getElementById('app');
+      var TIPOS = { 'imv-sessao-get': 1, 'imv-sessao-set': 1 };
+      /* o tipo conhecido; o valor, quando vem, é texto; o token gravado é o uuid do servidor */
+      function noFormato(d) {
+        if (!d || typeof d !== 'object' || !TIPOS[d.tipo]) return false;
+        if (d.value !== undefined && typeof d.value !== 'string') return false;
+        return !(d.tipo === 'imv-sessao-set' && d.value && !/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(d.value));
+      }
+      /* A página do app roda no host de script DESTE projeto (medido em 19/11 pela /exec e por este
+         wrapper; V3-001 §14.18). O fim "5fhtazmluk2i" é igual ao do #13: o que separa os projetos é o
+         começo. O número antes do "lu" fica aberto, como no #13 (não está medido se ele muda). */
+      function doGoogle(origem) {
+        return /^https:\/\/n-yewxj7bvxu6by7id2hbd4o3xwig5fhtazmluk2i-\d+lu-script\.googleusercontent\.com$/.test(origem);
+      }
+      /* e mora 2 frames abaixo do iframe: /exec -> painel -> página */
+      function doIframe(w) {
+        var p = w && w.parent;
+        return !!p && p !== w && p.parent === app.contentWindow;
+      }
+      window.addEventListener('message', function (ev) {
+        if (!doIframe(ev.source) || !doGoogle(ev.origin) || !noFormato(ev.data)) return;
+        var d = ev.data;
+        try {
+          if (d.tipo === 'imv-sessao-get') {
+            ev.source.postMessage({ tipo: 'imv-sessao-value', value: localStorage.getItem(CHAVE) || '' }, ev.origin);
+          } else if (d.value) localStorage.setItem(CHAVE, d.value);
+          else localStorage.removeItem(CHAVE);
+        } catch (e) {
+          /* sem armazenamento (aba anônima, bloqueio): o app pede a senha */
+          if (d.tipo === 'imv-sessao-get') ev.source.postMessage({ tipo: 'imv-sessao-value', value: '' }, ev.origin);
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
